@@ -80,7 +80,7 @@ if uploaded_file is not None:
     df = pd.read_excel(uploaded_file)
     st.success("✅ Using uploaded dataset.")
 else:
-    df = pd.read_excel("trials.xlsx")
+    df = pd.read_excel("Sample Data.xlsx")
     st.info("ℹ️ Using built-in default dataset (trials.xlsx).")
 questions = [
     "Please compare ORR, CR, PR, mPFS, and mOS of M14TIL regimen with that of checkmate067's nivolumab + ipilimumab?",
