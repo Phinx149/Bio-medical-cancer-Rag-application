@@ -76,12 +76,14 @@ st.title("🔬 Clinical Trial QA with Gemini + Visualization")
 
 uploaded_file = st.file_uploader("📁 Upload Clinical Trial Excel File", type=["xlsx"])
 
-if uploaded_file is not None:
-    df = pd.read_excel(uploaded_file)
-    st.success("✅ Using uploaded dataset.")
-else:
-    df = pd.read_excel("Sample Data.xlsx")
-    st.info("ℹ️ Using built-in default dataset (trials.xlsx).")
+GITHUB_RAW_URL ="https://github.com/Phinx149/Bio-medical-cancer-Rag-application/raw/refs/heads/main/Sample%20Data.xlsx"
+
+try:
+    df = pd.read_excel(GITHUB_RAW_URL)
+    st.success("✅ Using Excel data from GitHub.")
+except Exception as e:
+    st.error(f"❌ Failed to load data from GitHub: {e}")
+
 questions = [
     "Please compare ORR, CR, PR, mPFS, and mOS of M14TIL regimen with that of checkmate067's nivolumab + ipilimumab?",
     "How do ORR, CR, PFS, OS, and Gr ≥3 TRAEs compare between CHECKMATE-511 and CHECKMATE-067 regimens?",
