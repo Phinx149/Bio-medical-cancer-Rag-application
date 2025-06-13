@@ -6,57 +6,45 @@ import nltk
 import os
 import re
 from nltk import word_tokenize, pos_tag
-# import shutil # We won't need shutil for cleanup with this approach
 
-# --- Setup NLTK Data Directory ---
+# --- 1. Streamlit UI Setup (MUST BE FIRST) ---
+st.set_page_config(page_title="Clinical Trial QA + Viz", layout="wide")
+st.title("🔬 Clinical Trial QA with Gemini + Visualization") # Keep this here too
+
+# --- 2. Setup NLTK Data Directory ---
 # The path must be absolute to where Streamlit Cloud deploys your app.
-# os.path.dirname(__file__) gives the directory of the current script.
-# We'll create an 'nltk_data' folder right next to your app.py.
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
 os.makedirs(nltk_data_path, exist_ok=True)
 
 # Set the NLTK_DATA environment variable. This is the most reliable way.
-# This variable tells NLTK where to search for data.
 os.environ['NLTK_DATA'] = nltk_data_path
 
 # Add our custom data path to NLTK's search path.
-# We insert it at the beginning so it's checked first.
 if nltk_data_path not in nltk.data.path:
     nltk.data.path.insert(0, nltk_data_path)
 
 
-# --- NLTK Data Download Logic ---
-# --- NLTK Data Download Logic ---
-# Function to check and download NLTK data
+# --- 3. NLTK Data Download Logic (Now can use st. commands) ---
 def download_nltk_resource(resource_name, download_dir):
     try:
-        # Check if the resource is already available in NLTK's search paths
         nltk.data.find(resource_name)
         st.info(f"NLTK '{resource_name}' found.")
-    except LookupError: # Corrected: Only catch LookupError for find() failures
+    except LookupError:
         st.warning(f"NLTK '{resource_name}' not found. Attempting to download...")
         try:
             nltk.download(resource_name, download_dir=download_dir)
             st.success(f"NLTK '{resource_name}' downloaded successfully.")
-        except Exception as e: # Catch a generic Exception for the download process itself
+        except Exception as e:
             st.error(f"Failed to download '{resource_name}': {e}")
-            st.stop() # Stop the app if crucial data can't be downloaded
+            st.stop()
 
 # Download essential NLTK resources
 download_nltk_resource('punkt', nltk_data_path)
 download_nltk_resource('averaged_perceptron_tagger', nltk_data_path)
 
-# Download essential NLTK resources
-download_nltk_resource('punkt', nltk_data_path)
-download_nltk_resource('averaged_perceptron_tagger', nltk_data_path)
 
-# You generally don't need to download 'punkt_tab' or '_eng' explicitly.
-# The 'punkt' download typically provides the necessary data for PunktTokenizer,
-# and 'averaged_perceptron_tagger' is the standard English tagger.
-# If you still get errors about 'punkt_tab' after this, then there might be a
-# specific NLTK version interaction, but this is the standard way.
+# --- 4. Rest of your application code ---
 
-# The rest of your code remains the same...
 # --- Gemini API Key ---
 genai.configure(api_key="AIzaSyBBxbeH81SEWus594hftEH-QiiBLnx5BuQ")
 
@@ -110,9 +98,6 @@ def extract_code_block(text):
         match = re.search(r"```(.*?)```", text, re.DOTALL)
     return match.group(1) if match else None
 
-# --- Streamlit UI Setup ---
-st.set_page_config(page_title="Clinical Trial QA + Viz", layout="wide")
-st.title("🔬 Clinical Trial QA with Gemini + Visualization")
 
 uploaded_file = st.file_uploader("📁 Upload Clinical Trial Excel File", type=["xlsx"])
 
