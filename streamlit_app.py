@@ -76,6 +76,12 @@ st.title("🔬 Clinical Trial QA with Gemini + Visualization")
 
 uploaded_file = st.file_uploader("📁 Upload Clinical Trial Excel File", type=["xlsx"])
 
+if uploaded_file is not None:
+    df = pd.read_excel(uploaded_file)
+    st.success("✅ Using uploaded dataset.")
+else:
+    df = pd.read_excel("trials.xlsx")
+    st.info("ℹ️ Using built-in default dataset (trials.xlsx).")
 questions = [
     "Please compare ORR, CR, PR, mPFS, and mOS of M14TIL regimen with that of checkmate067's nivolumab + ipilimumab?",
     "How do ORR, CR, PFS, OS, and Gr ≥3 TRAEs compare between CHECKMATE-511 and CHECKMATE-067 regimens?",
