@@ -15,9 +15,9 @@ st.title("🔬 Clinical Trial QA with Gemini + Visualization")
 # The path to your COMMITTED nltk_data folder on Streamlit Cloud.
 # Streamlit Cloud deploys your repo to /mount/src/your-repo-name/
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
-
+os.environ['NLTK_DATA'] = '/mount/src/bio-medical-cancer-rag-application/nltk_data'
 # Set the NLTK_DATA environment variable. This is CRUCIAL for NLTK to find the data.
-os.environ['NLTK_DATA'] = nltk_data_path
+#os.environ['NLTK_DATA'] = nltk_data_path
 
 # Add our custom data path to NLTK's search path (optional, but good for redundancy)
 if nltk_data_path not in nltk.data.path:
