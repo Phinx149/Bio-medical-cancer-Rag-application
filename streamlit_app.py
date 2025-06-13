@@ -13,13 +13,17 @@ st.title("🔬 Clinical Trial QA with Gemini + Visualization")
 
 # --- 2. Setup NLTK Data Directory ---
 # The path must be absolute to where Streamlit Cloud deploys your app.
+# os.path.dirname(__file__) gives the directory of the current script.
+# We'll create an 'nltk_data' folder right next to your app.py.
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
 os.makedirs(nltk_data_path, exist_ok=True)
 
 # Set the NLTK_DATA environment variable. This is the most reliable way.
+# This variable tells NLTK where to search for data.
 os.environ['NLTK_DATA'] = nltk_data_path
 
 # Add our custom data path to NLTK's search path.
+# We insert it at the beginning so it's checked first.
 if nltk_data_path not in nltk.data.path:
     nltk.data.path.insert(0, nltk_data_path)
 
@@ -28,25 +32,25 @@ if nltk_data_path not in nltk.data.path:
 # Function to check and download NLTK data
 def download_nltk_resource(resource_name, download_dir):
     try:
+        # Check if the resource is already available in NLTK's search paths
         nltk.data.find(resource_name)
         st.info(f"NLTK '{resource_name}' found.")
-    except LookupError:
+    except LookupError: # Catch LookupError for find() failures
         st.warning(f"NLTK '{resource_name}' not found. Attempting to download...")
         try:
             nltk.download(resource_name, download_dir=download_dir)
             st.success(f"NLTK '{resource_name}' downloaded successfully.")
-        except Exception as e:
+        except Exception as e: # Catch a generic Exception for the download process itself
             st.error(f"Failed to download '{resource_name}': {e}")
-            st.stop()
+            st.stop() # Stop the app if crucial data can't be downloaded
 
 # Download essential NLTK resources
 download_nltk_resource('punkt', nltk_data_path)
 download_nltk_resource('averaged_perceptron_tagger', nltk_data_path)
-download_nltk_resource('punkt_tab', nltk_data_path) # Added this line for the specific punkt_tab data
+download_nltk_resource('punkt_tab', nltk_data_path)
+download_nltk_resource('averaged_perceptron_tagger_english', nltk_data_path) # NEW: Explicitly download the english version
 
-
-# --- 4. Rest of your application code ---
-
+# The rest of your code remains the same...
 # --- Gemini API Key ---
 genai.configure(api_key="AIzaSyBBxbeH81SEWus594hftEH-QiiBLnx5BuQ")
 
