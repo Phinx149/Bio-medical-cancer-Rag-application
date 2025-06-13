@@ -1,16 +1,19 @@
-# streamlit_app.py
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import google.generativeai as genai
 import nltk
+import os
 import re
 from nltk import word_tokenize, pos_tag
 
-# --- Download NLTK data ---
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
+# Set up local nltk_data path
+nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
+nltk.data.path.clear()  # <-- Clear default paths so only yours is used
+nltk.data.path.append(nltk_data_path)
+
+#nltk.download('punkt')
+#nltk.download('averaged_perceptron_tagger')
 
 # --- Gemini API Key ---
 genai.configure(api_key="AIzaSyBBxbeH81SEWus594hftEH-QiiBLnx5BuQ")
