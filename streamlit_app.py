@@ -12,24 +12,11 @@ from nltk import word_tokenize, pos_tag
 import re
 
 
-# --- Setup NLTK Data Directory ---
-nltk_data_path = "/content/nltk_data"
-os.makedirs(nltk_data_path, exist_ok=True)
-shutil.rmtree(os.path.join(nltk_data_path, 'tokenizers'), ignore_errors=True)
-shutil.rmtree(os.path.join(nltk_data_path, 'taggers'), ignore_errors=True)
-shutil.rmtree('/root/nltk_data/tokenizers', ignore_errors=True)
-shutil.rmtree('/root/nltk_data/taggers', ignore_errors=True)
-nltk.data.path = [nltk_data_path]
-nltk.download('punkt', download_dir=nltk_data_path)
-nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_path)
-try:
-    nltk.download('averaged_perceptron_tagger_eng', download_dir=nltk_data_path)
-except Exception as e:
-    print(f"Warning: Could not download 'averaged_perceptron_tagger_eng'. Error: {e}")
-try:
-    nltk.download('punkt_tab', download_dir=nltk_data_path)
-except Exception as e:
-    print(f"Warning: Could not download 'punkt_tab'. Error: {e}")
+import nltk
+
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
 
 # --- Gemini API Key ---
 genai.configure(api_key="AIzaSyBBxbeH81SEWus594hftEH-QiiBLnx5BuQ")
