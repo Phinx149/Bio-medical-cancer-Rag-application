@@ -76,13 +76,10 @@ st.title("🔬 Clinical Trial QA with Gemini + Visualization")
 
 uploaded_file = st.file_uploader("📁 Upload Clinical Trial Excel File", type=["xlsx"])
 
-GITHUB_RAW_URL ="https://github.com/Phinx149/Bio-medical-cancer-Rag-application/raw/refs/heads/main/Sample%20Data.xlsx"
 
-try:
-    df = pd.read_excel(GITHUB_RAW_URL)
-    st.success("✅ Using Excel data from GitHub.")
-except Exception as e:
-    st.error(f"❌ Failed to load data from GitHub: {e}")
+
+GITHUB_RAW_URL = "https://github.com/Phinx149/Bio-medical-cancer-Rag-application/raw/refs/heads/main/Sample%20Data.xlsx"
+df = pd.read_excel(GITHUB_RAW_URL)
 
 questions = [
     "Please compare ORR, CR, PR, mPFS, and mOS of M14TIL regimen with that of checkmate067's nivolumab + ipilimumab?",
