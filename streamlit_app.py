@@ -12,8 +12,7 @@ st.set_page_config(page_title="Clinical Trial QA + Viz", layout="wide")
 st.title("🔬 Clinical Trial QA with Gemini + Visualization")
 
 # --- 2. Setup NLTK Data Directory ---
-# The path to your committed nltk_data folder on Streamlit Cloud.
-# os.path.dirname(__file__) gives the directory of the current script.
+# The path to your COMMITTED nltk_data folder on Streamlit Cloud.
 # Streamlit Cloud deploys your repo to /mount/src/your-repo-name/
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
 
@@ -24,9 +23,9 @@ os.environ['NLTK_DATA'] = nltk_data_path
 if nltk_data_path not in nltk.data.path:
     nltk.data.path.insert(0, nltk_data_path)
 
-# --- 3. REMOVED ALL NLTK Data Download Logic ---
+# --- 3. ***REMOVED ALL NLTK Data Download Logic*** ---
 # The data is now expected to be available in the committed 'nltk_data' folder.
-# No more 'download_nltk_resource' function or calls here.
+# The 'download_nltk_resource' function and its calls are GONE.
 
 # --- Gemini API Key ---
 genai.configure(api_key="AIzaSyBBxbeH81SEWus594hftEH-QiiBLnx5BuQ")
