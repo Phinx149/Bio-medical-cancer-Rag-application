@@ -6,23 +6,31 @@ import nltk
 import os
 import re
 from nltk import word_tokenize, pos_tag
-nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
-os.makedirs(nltk_data_path, exist_ok=True)
-nltk.data.path.append(nltk_data_path)
 
+# Define the NLTK data path
+nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
+
+# Ensure the directory exists
+os.makedirs(nltk_data_path, exist_ok=True)
+
+# Set the NLTK_DATA environment variable
+# This is crucial for NLTK to find the data
+os.environ['NLTK_DATA'] = nltk_data_path
+
+# Now, try to find/download the data
 try:
     nltk.data.find('tokenizers/punkt')
 except nltk.downloader.DownloadError:
+    st.write("Downloading punkt tokenizer...") # Add a message for debugging
     nltk.download('punkt', download_dir=nltk_data_path)
 
 try:
     nltk.data.find('taggers/averaged_perceptron_tagger')
 except nltk.downloader.DownloadError:
+    st.write("Downloading averaged_perceptron_tagger...") # Add a message for debugging
     nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_path)
 
-#nltk.download('punkt')
-#nltk.download('averaged_perceptron_tagger')
-
+# The rest of your code remains the same...
 # --- Gemini API Key ---
 genai.configure(api_key="AIzaSyBBxbeH81SEWus594hftEH-QiiBLnx5BuQ")
 
@@ -142,6 +150,7 @@ if st.session_state.answer.strip() != "":
             try:
                 exec(code_block)
                 st.pyplot(plt.gcf())
+                plt.close('all')
             except Exception as e:
                 st.error(f"❌ Error executing generated code: {e}")
         else:
