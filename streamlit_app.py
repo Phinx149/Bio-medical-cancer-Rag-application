@@ -6,29 +6,28 @@ import nltk
 import os
 import re
 from nltk import word_tokenize, pos_tag
+import shutil
 
-# Define the NLTK data path
-nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
 
-# Ensure the directory exists
+
+# --- Setup NLTK Data Directory ---
+nltk_data_path = "/content/nltk_data"
 os.makedirs(nltk_data_path, exist_ok=True)
-
-# Set the NLTK_DATA environment variable
-# This is crucial for NLTK to find the data
-os.environ['NLTK_DATA'] = nltk_data_path
-
-# Now, try to find/download the data
+shutil.rmtree(os.path.join(nltk_data_path, 'tokenizers'), ignore_errors=True)
+shutil.rmtree(os.path.join(nltk_data_path, 'taggers'), ignore_errors=True)
+shutil.rmtree('/root/nltk_data/tokenizers', ignore_errors=True)
+shutil.rmtree('/root/nltk_data/taggers', ignore_errors=True)
+nltk.data.path = [nltk_data_path]
+nltk.download('punkt', download_dir=nltk_data_path)
+nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_path)
 try:
-    nltk.data.find('tokenizers/punkt')
-except nltk.downloader.DownloadError:
-    st.write("Downloading punkt tokenizer...") # Add a message for debugging
-    nltk.download('punkt', download_dir=nltk_data_path)
-
+    nltk.download('averaged_perceptron_tagger_eng', download_dir=nltk_data_path)
+except Exception as e:
+    print(f"Warning: Could not download 'averaged_perceptron_tagger_eng'. Error: {e}")
 try:
-    nltk.data.find('taggers/averaged_perceptron_tagger')
-except nltk.downloader.DownloadError:
-    st.write("Downloading averaged_perceptron_tagger...") # Add a message for debugging
-    nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_path)
+    nltk.download('punkt_tab', download_dir=nltk_data_path)
+except Exception as e:
+    print(f"Warning: Could not download 'punkt_tab'. Error: {e}")
 
 # The rest of your code remains the same...
 # --- Gemini API Key ---
