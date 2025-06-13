@@ -11,14 +11,20 @@ from nltk import word_tokenize, pos_tag
 st.set_page_config(page_title="Clinical Trial QA + Viz", layout="wide")
 st.title("🔬 Clinical Trial QA with Gemini + Visualization")
 
-# --- 2. Setup NLTK Data Directory ---
-# The path to your COMMITTED nltk_data folder on Streamlit Cloud.
-# Streamlit Cloud deploys your repo to /mount/src/your-repo-name/
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
-os.environ['NLTK_DATA'] = '/mount/src/bio-medical-cancer-rag-application/nltk_data'
-# Set the NLTK_DATA environment variable. This is CRUCIAL for NLTK to find the data.
-#os.environ['NLTK_DATA'] = nltk_data_path
+os.environ['NLTK_DATA'] = nltk_data_path
 
+try:
+    nltk.data.find('taggers/averaged_perceptron_tagger')
+except LookupError:
+    print("Downloading 'averaged_perceptron_tagger'...")
+    nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_path)
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    print("Downloading 'punkt'...")
+    nltk.download('punkt', download_dir=nltk_data_path)
 # Add our custom data path to NLTK's search path (optional, but good for redundancy)
 if nltk_data_path not in nltk.data.path:
     nltk.data.path.insert(0, nltk_data_path)
