@@ -6,11 +6,19 @@ import nltk
 import os
 import re
 from nltk import word_tokenize, pos_tag
-
-# Set up local nltk_data path
 nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
-nltk.data.path.clear()  # <-- Clear default paths so only yours is used
+os.makedirs(nltk_data_path, exist_ok=True)
 nltk.data.path.append(nltk_data_path)
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except nltk.downloader.DownloadError:
+    nltk.download('punkt', download_dir=nltk_data_path)
+
+try:
+    nltk.data.find('taggers/averaged_perceptron_tagger')
+except nltk.downloader.DownloadError:
+    nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_path)
 
 #nltk.download('punkt')
 #nltk.download('averaged_perceptron_tagger')
