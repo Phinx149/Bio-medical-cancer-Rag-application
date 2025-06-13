@@ -9,7 +9,7 @@ from nltk import word_tokenize, pos_tag
 
 # --- 1. Streamlit UI Setup (MUST BE FIRST) ---
 st.set_page_config(page_title="Clinical Trial QA + Viz", layout="wide")
-st.title("🔬 Clinical Trial QA with Gemini + Visualization") # Keep this here too
+st.title("🔬 Clinical Trial QA with Gemini + Visualization")
 
 # --- 2. Setup NLTK Data Directory ---
 # The path must be absolute to where Streamlit Cloud deploys your app.
@@ -24,7 +24,8 @@ if nltk_data_path not in nltk.data.path:
     nltk.data.path.insert(0, nltk_data_path)
 
 
-# --- 3. NLTK Data Download Logic (Now can use st. commands) ---
+# --- 3. NLTK Data Download Logic ---
+# Function to check and download NLTK data
 def download_nltk_resource(resource_name, download_dir):
     try:
         nltk.data.find(resource_name)
@@ -41,6 +42,7 @@ def download_nltk_resource(resource_name, download_dir):
 # Download essential NLTK resources
 download_nltk_resource('punkt', nltk_data_path)
 download_nltk_resource('averaged_perceptron_tagger', nltk_data_path)
+download_nltk_resource('punkt_tab', nltk_data_path) # Added this line for the specific punkt_tab data
 
 
 # --- 4. Rest of your application code ---
