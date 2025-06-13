@@ -26,28 +26,25 @@ if nltk_data_path not in nltk.data.path:
 
 
 # --- NLTK Data Download Logic ---
+# --- NLTK Data Download Logic ---
 # Function to check and download NLTK data
 def download_nltk_resource(resource_name, download_dir):
     try:
         # Check if the resource is already available in NLTK's search paths
         nltk.data.find(resource_name)
         st.info(f"NLTK '{resource_name}' found.")
-    except nltk.downloader.DownloadError: # This exception class should now be correct or LookupError
+    except LookupError: # Corrected: Only catch LookupError for find() failures
         st.warning(f"NLTK '{resource_name}' not found. Attempting to download...")
         try:
             nltk.download(resource_name, download_dir=download_dir)
             st.success(f"NLTK '{resource_name}' downloaded successfully.")
-        except Exception as e:
+        except Exception as e: # Catch a generic Exception for the download process itself
             st.error(f"Failed to download '{resource_name}': {e}")
             st.stop() # Stop the app if crucial data can't be downloaded
-    except LookupError: # Also catch LookupError, which is what find() raises
-        st.warning(f"NLTK '{resource_name}' not found. Attempting to download...")
-        try:
-            nltk.download(resource_name, download_dir=download_dir)
-            st.success(f"NLTK '{resource_name}' downloaded successfully.")
-        except Exception as e:
-            st.error(f"Failed to download '{resource_name}': {e}")
-            st.stop()
+
+# Download essential NLTK resources
+download_nltk_resource('punkt', nltk_data_path)
+download_nltk_resource('averaged_perceptron_tagger', nltk_data_path)
 
 # Download essential NLTK resources
 download_nltk_resource('punkt', nltk_data_path)
