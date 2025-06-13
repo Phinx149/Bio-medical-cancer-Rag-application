@@ -6,28 +6,58 @@ import nltk
 import os
 import re
 from nltk import word_tokenize, pos_tag
-import shutil
-
-
+# import shutil # We won't need shutil for cleanup with this approach
 
 # --- Setup NLTK Data Directory ---
-nltk_data_path = "/content/nltk_data"
+# The path must be absolute to where Streamlit Cloud deploys your app.
+# os.path.dirname(__file__) gives the directory of the current script.
+# We'll create an 'nltk_data' folder right next to your app.py.
+nltk_data_path = os.path.join(os.path.dirname(__file__), 'nltk_data')
 os.makedirs(nltk_data_path, exist_ok=True)
-shutil.rmtree(os.path.join(nltk_data_path, 'tokenizers'), ignore_errors=True)
-shutil.rmtree(os.path.join(nltk_data_path, 'taggers'), ignore_errors=True)
-shutil.rmtree('/root/nltk_data/tokenizers', ignore_errors=True)
-shutil.rmtree('/root/nltk_data/taggers', ignore_errors=True)
-nltk.data.path = [nltk_data_path]
-nltk.download('punkt', download_dir=nltk_data_path)
-nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_path)
-try:
-    nltk.download('averaged_perceptron_tagger_eng', download_dir=nltk_data_path)
-except Exception as e:
-    print(f"Warning: Could not download 'averaged_perceptron_tagger_eng'. Error: {e}")
-try:
-    nltk.download('punkt_tab', download_dir=nltk_data_path)
-except Exception as e:
-    print(f"Warning: Could not download 'punkt_tab'. Error: {e}")
+
+# Set the NLTK_DATA environment variable. This is the most reliable way.
+# This variable tells NLTK where to search for data.
+os.environ['NLTK_DATA'] = nltk_data_path
+
+# Add our custom data path to NLTK's search path.
+# We insert it at the beginning so it's checked first.
+if nltk_data_path not in nltk.data.path:
+    nltk.data.path.insert(0, nltk_data_path)
+
+
+# --- NLTK Data Download Logic ---
+# Function to check and download NLTK data
+def download_nltk_resource(resource_name, download_dir):
+    try:
+        # Check if the resource is already available in NLTK's search paths
+        nltk.data.find(resource_name)
+        st.info(f"NLTK '{resource_name}' found.")
+    except nltk.downloader.DownloadError: # This exception class should now be correct or LookupError
+        st.warning(f"NLTK '{resource_name}' not found. Attempting to download...")
+        try:
+            nltk.download(resource_name, download_dir=download_dir)
+            st.success(f"NLTK '{resource_name}' downloaded successfully.")
+        except Exception as e:
+            st.error(f"Failed to download '{resource_name}': {e}")
+            st.stop() # Stop the app if crucial data can't be downloaded
+    except LookupError: # Also catch LookupError, which is what find() raises
+        st.warning(f"NLTK '{resource_name}' not found. Attempting to download...")
+        try:
+            nltk.download(resource_name, download_dir=download_dir)
+            st.success(f"NLTK '{resource_name}' downloaded successfully.")
+        except Exception as e:
+            st.error(f"Failed to download '{resource_name}': {e}")
+            st.stop()
+
+# Download essential NLTK resources
+download_nltk_resource('punkt', nltk_data_path)
+download_nltk_resource('averaged_perceptron_tagger', nltk_data_path)
+
+# You generally don't need to download 'punkt_tab' or '_eng' explicitly.
+# The 'punkt' download typically provides the necessary data for PunktTokenizer,
+# and 'averaged_perceptron_tagger' is the standard English tagger.
+# If you still get errors about 'punkt_tab' after this, then there might be a
+# specific NLTK version interaction, but this is the standard way.
 
 # The rest of your code remains the same...
 # --- Gemini API Key ---
