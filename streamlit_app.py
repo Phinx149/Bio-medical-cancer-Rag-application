@@ -1,13 +1,12 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import google.generativeai as genai
 import nltk
 import os
 import shutil
 from nltk import word_tokenize, pos_tag
 import re
-
 
 # --- Setup NLTK Data Directory ---
 nltk_data_path = "/content/nltk_data"
@@ -51,7 +50,7 @@ def row_matcher(df, question):
 def generate_answer_only(question, context_df):
     model = genai.GenerativeModel("gemini-1.5-flash")
     prompt = f"""You are a clinical trials assistant. Use the context below to answer the question.
-If the answer is not found, say \"I am not sure about this answer, please check the database.\"
+If the answer is not found, say "I am not sure about this answer, please check the database."
 Be factual and detailed. Ensure presentation is in tabular format.
 
 Context:
@@ -66,25 +65,21 @@ Answer:"""
 def generate_plot_code_from_answer(context_str):
     model = genai.GenerativeModel("gemini-1.5-flash")
     prompt = f"""You are a Python data visualization assistant. Given the following clinical trial summary, generate Python code using matplotlib or seaborn to visualize the most relevant metrics.
-Ensure the code includes clear x axis ,y axis labels which are Descriptive and Accurate and Relavant, an informative title which is accurate, and uses the best-fit chart type (bar, pie, line, etc.) Make the graph detailed. The graph should be very relavant to the question.
+Ensure the code includes clear x axis ,y axis labels which are Descriptive and Accurate and Relevant, an informative title which is accurate, and uses the best-fit chart type (bar, pie, line, etc.) Make the graph detailed. The graph should be very relevant to the question.
 
 {context_str}
 
 Python code only:"""
     return model.generate_content(prompt).text
 
-# --- Extract Code Block ---
+# --- Fixed: Extract Python Code Block ---
 def extract_code_block(text):
-    match = re.search(r"
-python\s+(.*?)
-", text, re.DOTALL)
+    match = re.search(r"```python\s+(.*?)```", text, re.DOTALL)
     if not match:
-        match = re.search(r"
-(.*?)
-", text, re.DOTALL)
+        match = re.search(r"```(.*?)```", text, re.DOTALL)
     return match.group(1) if match else None
 
-
+# --- Streamlit UI ---
 st.set_page_config(page_title="Clinical Trial QA + Viz", layout="wide")
 st.title("🔬 Clinical Trial QA with Gemini + Visualization")
 
@@ -99,7 +94,7 @@ questions = [
     "How the DREAMseq is different from CHECKMATE-067?"
 ]
 
-# --- Session State Initialization and Reset ---
+# --- Session State ---
 if "prev_question" not in st.session_state:
     st.session_state.prev_question = ""
 if "answer" not in st.session_state:
@@ -107,7 +102,6 @@ if "answer" not in st.session_state:
 
 selected_question = st.selectbox("❓ Select a Question", questions)
 
-# Reset answer if question changed
 if selected_question != st.session_state.prev_question:
     st.session_state.answer = ""
     st.session_state.prev_question = selected_question
@@ -116,38 +110,52 @@ if uploaded_file:
     df = pd.read_excel(uploaded_file)
     df.columns = [col.strip() for col in df.columns]
 
-    #st.subheader("📄 Matched Rows")
     matched_df = row_matcher(df, selected_question)
-    #st.dataframe(matched_df)
 
     st.subheader("🧠 Gemini Q/A Answer")
-
-    # Display existing answer
     if st.session_state.answer:
         st.markdown(st.session_state.answer)
 
-    # Button to generate answer
     if st.button("Generate Answer"):
         answer_text = generate_answer_only(selected_question, matched_df)
         st.session_state.answer = answer_text
         st.markdown(answer_text)
 
-    # Button to generate graph
     if st.session_state.answer.strip() != "":
         st.subheader("📊 Graph Based on Answer")
         if st.button("Generate Graph from Answer"):
             full_context = f"""Matched Rows:\n{matched_df.to_string(index=False)}\n\nQuestion:\n{selected_question}\n\nAnswer:\n{st.session_state.answer}"""
             plot_code_response = generate_plot_code_from_answer(full_context)
 
-            st.subheader("📈 Executed Plot")
-            code_block = extract_code_block(plot_code_response)
-            if code_block:
-                try:
-                    exec(code_block)
-                    st.pyplot(plt.gcf())
-                except Exception as e:
-                    st.error(f"❌ Error executing generated code: {e}")
-            else:
-                st.warning("⚠️ No valid Python code block found.")
+            st.subheader("📈 Interactive Graph")
+            try:
+                fig = go.Figure()
+                numeric_cols = matched_df.select_dtypes(include='number').columns
+                category_col = matched_df.columns[0]
+
+                colors = ['green', 'blue', 'orange', 'red', 'purple']
+                for i, metric in enumerate(numeric_cols):
+                    fig.add_trace(go.Bar(
+                        y=matched_df[category_col],
+                        x=matched_df[metric],
+                        name=metric,
+                        orientation='h',
+                        marker_color=colors[i % len(colors)],
+                        hovertemplate=f"%{{x}}%<extra>{metric}</extra>"
+                    ))
+
+                fig.update_layout(
+                    title="Interactive Clinical Trial Metrics",
+                    barmode='group',
+                    xaxis_title="Percentage",
+                    yaxis_title=category_col,
+                    height=500,
+                    legend_title="Metric",
+                    margin=dict(l=100, r=20, t=50, b=40)
+                )
+
+                st.plotly_chart(fig, use_container_width=True)
+            except Exception as e:
+                st.error(f"❌ Error generating interactive graph: {e}")
 else:
     st.info("Upload an Excel file to begin.")
